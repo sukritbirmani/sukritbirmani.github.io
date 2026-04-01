@@ -1,0 +1,1452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sukrit Birmani</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/TextPlugin.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.net.min.js"></script>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #080808;
+      --bg2: #0d0d0d;
+      --text: #F0F0F0;
+      --muted: #444444;
+      --blue: #4361EE;
+      --green: #39FF14;
+      --purple: #9B5DE5;
+      --cyan: #00F5FF;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Space Grotesk', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.4;
+    }
+
+    a { color: inherit; text-decoration: none; cursor: none; }
+
+    .gradient-text {
+      background: linear-gradient(135deg, #4361EE 0%, #9B5DE5 25%, #00F5FF 50%, #39FF14 75%, #4361EE 100%);
+      background-size: 400% 400%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: gradientShift 6s ease infinite;
+    }
+
+    .gradient-text-cyan-green {
+      background: linear-gradient(135deg, #00F5FF, #39FF14);
+      background-size: 400% 400%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: gradientShift 6s ease infinite;
+    }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* ══════ SCROLL PROGRESS ══════ */
+    #scroll-progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 3px;
+      width: 0%;
+      background: linear-gradient(90deg, #4361EE, #9B5DE5, #00F5FF, #39FF14);
+      z-index: 10000;
+      transition: width 0.1s linear;
+    }
+
+    /* ══════ INTRO ══════ */
+    #intro {
+      position: fixed;
+      inset: 0;
+      background: #000;
+      z-index: 99999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #intro-text {
+      font-family: 'Space Grotesk', sans-serif;
+      font-style: italic;
+      font-size: 1.4rem;
+      color: #fff;
+      letter-spacing: 0.1em;
+    }
+
+    /* ══════ SB LOGO ══════ */
+    #sb-logo {
+      position: fixed;
+      top: 2rem;
+      left: 3rem;
+      z-index: 9998;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.5rem;
+      color: #fff;
+      cursor: none;
+      letter-spacing: 0.05em;
+      opacity: 0;
+    }
+
+    /* ══════ NAV ══════ */
+    #nav {
+      position: fixed;
+      top: 0;
+      right: 0;
+      z-index: 9998;
+      padding: 2rem 3rem;
+      display: flex;
+      gap: 2.5rem;
+      opacity: 0;
+    }
+    #nav a {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--muted);
+      transition: color 0.3s;
+    }
+    #nav a:hover { color: var(--text); }
+
+    /* ══════ CROSSHAIR CURSOR ══════ */
+    #crosshair {
+      position: fixed;
+      pointer-events: none;
+      z-index: 99998;
+      top: 0;
+      left: 0;
+    }
+    #crosshair .ch-h, #crosshair .ch-v {
+      position: absolute;
+      background: #fff;
+    }
+    #crosshair .ch-h {
+      width: 24px;
+      height: 1px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+    #crosshair .ch-v {
+      width: 1px;
+      height: 24px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+    #crosshair .ch-circle {
+      width: 8px;
+      height: 8px;
+      border: 1px solid #fff;
+      border-radius: 50%;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    /* ══════ CURSOR TRAIL ══════ */
+    .trail-dot {
+      position: fixed;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9997;
+      top: 0;
+      left: 0;
+    }
+
+    /* ══════ HERO CINEMATIC ══════ */
+    #hero-cinematic {
+      position: relative;
+      width: 100%;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .hero-img-wrap {
+      position: relative;
+      width: 100%;
+      max-width: 700px;
+      z-index: 2;
+    }
+    .hero-img-wrap img {
+      width: 100%;
+      height: auto;
+      display: block;
+      opacity: 0;
+      transition: filter 0.4s ease;
+    }
+    .hero-img-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 3;
+      transition: background 0.3s;
+    }
+    .hero-subtitle {
+      position: absolute;
+      bottom: 1.5rem;
+      left: 0;
+      width: 100%;
+      text-align: center;
+      z-index: 4;
+      font-family: 'Space Grotesk', sans-serif;
+      font-style: italic;
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.7);
+      letter-spacing: 0.12em;
+    }
+    /* Spider-web overlay */
+    .hero-web-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 5;
+      opacity: 0;
+      pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'%3E%3Cline x1='100' y1='0' x2='100' y2='200' stroke='%23ff0000' stroke-width='0.5' opacity='0.3'/%3E%3Cline x1='0' y1='100' x2='200' y2='100' stroke='%23ff0000' stroke-width='0.5' opacity='0.3'/%3E%3Cline x1='0' y1='0' x2='200' y2='200' stroke='%23ff0000' stroke-width='0.5' opacity='0.3'/%3E%3Cline x1='200' y1='0' x2='0' y2='200' stroke='%23ff0000' stroke-width='0.5' opacity='0.3'/%3E%3Ccircle cx='100' cy='100' r='30' fill='none' stroke='%23ff0000' stroke-width='0.3' opacity='0.25'/%3E%3Ccircle cx='100' cy='100' r='60' fill='none' stroke='%23ff0000' stroke-width='0.3' opacity='0.2'/%3E%3Ccircle cx='100' cy='100' r='90' fill='none' stroke='%23ff0000' stroke-width='0.3' opacity='0.15'/%3E%3Cline x1='50' y1='0' x2='100' y2='100' stroke='%23ff0000' stroke-width='0.3' opacity='0.2'/%3E%3Cline x1='150' y1='0' x2='100' y2='100' stroke='%23ff0000' stroke-width='0.3' opacity='0.2'/%3E%3Cline x1='0' y1='50' x2='100' y2='100' stroke='%23ff0000' stroke-width='0.3' opacity='0.2'/%3E%3Cline x1='200' y1='50' x2='100' y2='100' stroke='%23ff0000' stroke-width='0.3' opacity='0.2'/%3E%3Cline x1='0' y1='150' x2='100' y2='100' stroke='%23ff0000' stroke-width='0.3' opacity='0.2'/%3E%3Cline x1='200' y1='150' x2='100' y2='100' stroke='%23ff0000' stroke-width='0.3' opacity='0.2'/%3E%3Cline x1='50' y1='200' x2='100' y2='100' stroke='%23ff0000' stroke-width='0.3' opacity='0.2'/%3E%3Cline x1='150' y1='200' x2='100' y2='100' stroke='%23ff0000' stroke-width='0.3' opacity='0.2'/%3E%3C/svg%3E");
+      background-size: 200px 200px;
+      transition: opacity 0.4s;
+    }
+
+    /* ══════ HERO MARQUEE ══════ */
+    #hero-marquee {
+      padding: 4rem 0;
+      overflow: hidden;
+      opacity: 0;
+    }
+    .marquee-row {
+      white-space: nowrap;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 18vw;
+      line-height: 1;
+      overflow: hidden;
+      position: relative;
+    }
+    .marquee-row .marquee-inner {
+      display: inline-block;
+      will-change: transform;
+    }
+    .marquee-row span {
+      display: inline-block;
+      transition: color 0.15s;
+      cursor: none;
+    }
+    .marquee-row.row-1 { color: #fff; }
+    .marquee-row.row-2 {
+      color: var(--text);
+      font-size: 14vw;
+    }
+    .marquee-row.row-3 {
+      font-size: 12vw;
+    }
+    .marquee-row.row-3 .marquee-inner {
+      background: linear-gradient(135deg, #00F5FF, #39FF14);
+      background-size: 400% 400%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: gradientShift 6s ease infinite;
+    }
+
+    /* ══════ ABOUT ══════ */
+    .about-section {
+      padding: 10rem 8vw;
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+    }
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6rem;
+      width: 100%;
+      align-items: center;
+    }
+    .about-left { position: relative; }
+    .about-number {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 20vw;
+      color: var(--cyan);
+      opacity: 0.08;
+      position: absolute;
+      top: -4rem;
+      left: -2rem;
+      line-height: 1;
+      z-index: 0;
+    }
+    .about-bio {
+      position: relative;
+      z-index: 1;
+      font-size: 1.1rem;
+      line-height: 1.8;
+      color: #ccc;
+    }
+    .about-right {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    /* ══════ MARQUEE DIVIDER ══════ */
+    .marquee-divider {
+      overflow: hidden;
+      padding: 2rem 0;
+      white-space: nowrap;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 3vw;
+      color: #333;
+      letter-spacing: 0.05em;
+    }
+    .marquee-divider .divider-inner {
+      display: inline-block;
+      will-change: transform;
+    }
+
+    /* ══════ SPIDERVERSE SECTION ══════ */
+    .spiderverse-banner {
+      position: relative;
+      width: 100%;
+      height: 420px;
+      overflow: hidden;
+      margin-bottom: 3rem;
+    }
+    .spiderverse-banner .banner-bg {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      transition: transform 0.4s ease;
+    }
+    .spiderverse-banner:hover .banner-bg {
+      transform: scale(1.05);
+    }
+    .spiderverse-banner .banner-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.3);
+      z-index: 1;
+    }
+    .spiderverse-banner .banner-title {
+      position: absolute;
+      bottom: 2rem;
+      left: 8vw;
+      z-index: 2;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 6vw;
+      line-height: 1;
+      color: #fff;
+    }
+
+    /* ══════ EXPERIENCE ══════ */
+    .experience-section {
+      padding: 8rem 8vw;
+      position: relative;
+    }
+    .section-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 6vw;
+      margin-bottom: 4rem;
+      line-height: 1;
+    }
+    .exp-card {
+      background: #111111;
+      border-left: 4px solid var(--cyan);
+      padding: 2.5rem 3rem 3.5rem;
+      margin-bottom: 2rem;
+      position: relative;
+      opacity: 0;
+      transform: translateY(40px);
+      overflow: hidden;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .exp-card:nth-child(3) { border-left-color: var(--blue); }
+    .exp-card-content { flex: 1; }
+    .exp-card-logo {
+      width: 200px;
+      height: 100px;
+      object-fit: contain;
+      flex-shrink: 0;
+      margin-left: 3rem;
+    }
+    .exp-badge {
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      padding: 0.3rem 1rem;
+      border-radius: 100px;
+      text-transform: uppercase;
+      display: inline-block;
+      margin-bottom: 0.8rem;
+    }
+    .exp-badge.incoming { background: var(--cyan); color: #000; }
+    .exp-badge.completed { background: var(--blue); color: #fff; }
+    .exp-company {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.5rem;
+      line-height: 1.1;
+      margin-bottom: 0.3rem;
+    }
+    .exp-role {
+      font-size: 1rem;
+      color: var(--text);
+      margin-bottom: 0.5rem;
+    }
+    .exp-detail {
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    .exp-date {
+      font-size: 0.75rem;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      margin-top: 0.8rem;
+    }
+
+    /* ══════ PROJECTS HORIZONTAL SCROLL ══════ */
+    .projects-section {
+      position: relative;
+      overflow: hidden;
+    }
+    .projects-track {
+      display: flex;
+      width: max-content;
+    }
+    .project-panel {
+      width: 100vw;
+      height: 100vh;
+      flex-shrink: 0;
+      padding: 5rem 8vw;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      background: #0a0a0a;
+    }
+    .project-watermark {
+      position: absolute;
+      right: -2rem;
+      top: 50%;
+      transform: translateY(-50%) rotate(-90deg);
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 12rem;
+      color: rgba(255,255,255,0.03);
+      white-space: nowrap;
+      pointer-events: none;
+      transform-origin: center center;
+    }
+    .project-number {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 8rem;
+      line-height: 1;
+      margin-bottom: 0.5rem;
+    }
+    .project-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 5rem;
+      line-height: 1;
+      margin-bottom: 0.8rem;
+      color: #fff;
+    }
+    .project-rule {
+      width: 100%;
+      height: 1px;
+      margin-bottom: 1rem;
+    }
+    .project-subtitle {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 1.2rem;
+    }
+    .project-desc {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.95rem;
+      color: #aaaaaa;
+      line-height: 1.7;
+      max-width: 600px;
+      margin-bottom: 1.2rem;
+    }
+    .project-tags {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.2rem;
+    }
+    .project-tag {
+      padding: 0.3rem 0.8rem;
+      background: transparent;
+      border-radius: 100px;
+      font-size: 0.75rem;
+      letter-spacing: 0.06em;
+    }
+    .project-bullets {
+      list-style: none;
+      margin-bottom: 1.5rem;
+      font-size: 0.88rem;
+      color: #888888;
+      line-height: 1.9;
+    }
+    .project-btn {
+      display: block;
+      width: 100%;
+      max-width: 600px;
+      padding: 1rem;
+      text-align: center;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      background: transparent;
+      transition: all 0.3s;
+    }
+    .project-btn:hover {
+      color: #000 !important;
+    }
+
+    /* ══════ SKILLS ══════ */
+    .skills-section {
+      padding: 8rem 8vw;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .skills-watermark {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 15vw;
+      color: #fff;
+      opacity: 0.03;
+      white-space: nowrap;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .skills-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-top: 3rem;
+      position: relative;
+      z-index: 1;
+    }
+    .skill-tag {
+      padding: 0.8rem 1.8rem;
+      border: 1px solid #2a2a2a;
+      font-size: 0.85rem;
+      letter-spacing: 0.08em;
+      color: var(--text);
+      transition: all 0.3s;
+      opacity: 0;
+      transform: translateY(-30px);
+    }
+    .skill-tag:hover {
+      border-color: var(--green);
+      box-shadow: 0 0 20px rgba(57,255,20,0.5);
+      transform: scale(1.05);
+      color: var(--green);
+    }
+
+    /* ══════ MARQUEE DIVIDER 2 ══════ */
+    .marquee-divider-2 {
+      overflow: hidden;
+      padding: 2rem 0;
+      white-space: nowrap;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 3vw;
+      color: #333;
+      letter-spacing: 0.05em;
+    }
+    .marquee-divider-2 .divider-inner-2 {
+      display: inline-block;
+      will-change: transform;
+    }
+
+    /* ══════ CLUBS ══════ */
+    .clubs-section {
+      padding: 8rem 8vw;
+    }
+    .club-entry {
+      border-top: 1px solid #1a1a1a;
+      padding: 2rem 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      position: relative;
+      overflow: hidden;
+      opacity: 0;
+      clip-path: inset(0 100% 0 0);
+    }
+    .club-entry::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 1px;
+      background: var(--purple);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.4s ease;
+    }
+    .club-entry:hover::before { transform: scaleX(1); }
+    .club-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.2rem;
+      line-height: 1.1;
+    }
+    .club-right {
+      text-align: right;
+      font-size: 0.8rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    .club-sublabel {
+      font-size: 0.75rem;
+      color: var(--purple);
+      margin-top: 0.3rem;
+    }
+    .club-link {
+      font-size: 0.7rem;
+      color: var(--purple);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-top: 0.3rem;
+      display: inline-block;
+      transition: opacity 0.3s;
+    }
+    .club-link:hover { opacity: 0.7; }
+
+    /* ══════ CONTACT ══════ */
+    .contact-section {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 6rem 8vw;
+      position: relative;
+    }
+    .contact-heading {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 15vw;
+      line-height: 0.95;
+      display: flex;
+      gap: 0.3em;
+      overflow: hidden;
+    }
+    .contact-heading .lets {
+      display: inline-block;
+      opacity: 0;
+      transform: translateX(-100px);
+    }
+    .contact-heading .talk {
+      display: inline-block;
+      opacity: 0;
+      transform: translateX(100px);
+    }
+    .contact-links {
+      margin-top: 3rem;
+      display: flex;
+      gap: 3rem;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+    .contact-links a {
+      transition: color 0.3s;
+      letter-spacing: 0.05em;
+    }
+    .contact-links a:hover { color: var(--text); }
+    .footer {
+      position: absolute;
+      bottom: 2rem;
+      font-size: 0.7rem;
+      color: #333;
+      letter-spacing: 0.15em;
+    }
+
+    /* ══════ RESPONSIVE ══════ */
+    @media (max-width: 768px) {
+      .about-grid { grid-template-columns: 1fr; gap: 3rem; }
+      .contact-heading { font-size: 20vw; }
+      .exp-badge { position: static; margin-bottom: 1rem; display: inline-block; }
+      .exp-date { position: static; margin-top: 1rem; display: block; }
+      #nav { padding: 1.5rem; gap: 1.5rem; }
+      #nav a { font-size: 0.65rem; }
+      .club-entry { flex-direction: column; gap: 0.5rem; }
+      .club-right { text-align: left; }
+      .project-title { font-size: 12vw; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- SCROLL PROGRESS -->
+<div id="scroll-progress"></div>
+
+<!-- INTRO -->
+<div id="intro">
+  <div id="intro-text"></div>
+</div>
+
+<!-- SB LOGO -->
+<a href="#" id="sb-logo" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;">SB</a>
+
+<!-- NAV -->
+<nav id="nav">
+  <a href="#about">ABOUT</a>
+  <a href="#work">WORK</a>
+  <a href="#skills">SKILLS</a>
+  <a href="#clubs">CLUBS</a>
+  <a href="#contact">CONTACT</a>
+</nav>
+
+<!-- CROSSHAIR CURSOR -->
+<div id="crosshair">
+  <div class="ch-h"></div>
+  <div class="ch-v"></div>
+  <div class="ch-circle"></div>
+</div>
+
+<!-- CURSOR TRAIL -->
+<div id="trail-container"></div>
+
+<!-- HERO CINEMATIC -->
+<section id="hero-cinematic">
+  <div class="hero-img-wrap">
+    <img src="stanlee.jpg" alt="Stan Lee">
+    <div class="hero-img-overlay"></div>
+    <div class="hero-web-overlay"></div>
+    <div class="hero-subtitle">you know I guess one person can make a difference</div>
+  </div>
+</section>
+
+<!-- HERO MARQUEE -->
+<section id="hero-marquee">
+  <div class="marquee-row row-1">
+    <div class="marquee-inner" data-text="SUKRIT BIRMANI — SUKRIT BIRMANI — SUKRIT BIRMANI — SUKRIT BIRMANI — "></div>
+  </div>
+  <div class="marquee-row row-2">
+    <div class="marquee-inner" data-text="MECHE STUDENT — BUILDER — ENGINEER — MECHE STUDENT — BUILDER — ENGINEER — "></div>
+  </div>
+  <div class="marquee-row row-3">
+    <div class="marquee-inner" data-text="MY MOM THINKS I'M COOL — MY MOM THINKS I'M COOL — MY MOM THINKS I'M COOL — "></div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="about-section" id="about">
+  <div class="about-grid">
+    <div class="about-left">
+      <div class="about-number">01</div>
+      <p class="about-bio">I'm Sukrit — grew up in Jakarta, now studying Mechanical Engineering at UCLA with a minor in Data Science. I've started a couple things, published some research, and somehow kept a 4.0 through all of it. One day I hope to help turn Indonesia into one of the world's tech superpowers. Jakarta to LA is just the first step.</p>
+    </div>
+    <div class="about-right">
+      <div id="about-slideshow" style="position:relative;width:100%;max-width:400px;aspect-ratio:3/4;overflow:hidden;border:1px solid #1a1a1a;">
+        <img src="sukrit1.jpg" class="slide-img active" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(0.8) contrast(1.1);opacity:1;transition:opacity 1s ease;">
+        <img src="sukrit2.jpg" class="slide-img" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(0.8) contrast(1.1);opacity:0;transition:opacity 1s ease;">
+        <img src="sukrit3.jpg" class="slide-img" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(0.8) contrast(1.1);opacity:0;transition:opacity 1s ease;">
+        <img src="sukrit4.jpg" class="slide-img" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(0.8) contrast(1.1);opacity:0;transition:opacity 1s ease;">
+        <img src="sukrit5.jpg" class="slide-img" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(0.8) contrast(1.1);opacity:0;transition:opacity 1s ease;">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE DIVIDER -->
+<div class="marquee-divider">
+  <div class="divider-inner">SUKRIT BIRMANI — MECHE @ UCLA — BUILDER — JAKARTA TO LA — 2026 — SUKRIT BIRMANI — MECHE @ UCLA — BUILDER — JAKARTA TO LA — 2026 — SUKRIT BIRMANI — MECHE @ UCLA — BUILDER — JAKARTA TO LA — 2026 — SUKRIT BIRMANI — MECHE @ UCLA — BUILDER — JAKARTA TO LA — 2026 — </div>
+</div>
+
+<!-- EXPERIENCE -->
+<section class="experience-section" id="work">
+  <!-- Spiderverse Banner -->
+  <div class="spiderverse-banner">
+    <img src="spiderverse.gif" alt="" class="banner-bg">
+    <div class="banner-overlay"></div>
+    <div class="banner-title">EXPERIENCE.</div>
+  </div>
+
+  <div class="exp-card">
+    <div class="exp-card-content">
+      <span class="exp-badge incoming">INCOMING</span>
+      <h3 class="exp-company">TERADYNE</h3>
+      <p class="exp-role">Software / Systems Intern</p>
+      <p class="exp-detail">Global leader in automated test equipment & industrial automation</p>
+      <span class="exp-date">Summer 2026</span>
+    </div>
+    <img src="teradyne.jpg" alt="Teradyne" class="exp-card-logo" style="filter:brightness(1.2) contrast(1.1);">
+  </div>
+
+  <div class="exp-card">
+    <div class="exp-card-content">
+      <span class="exp-badge completed">COMPLETED</span>
+      <h3 class="exp-company">JOTUN</h3>
+      <p class="exp-role">IT & Finance Intern · Jakarta, Indonesia</p>
+      <p class="exp-detail">Built Power BI dashboards and Excel data models for regional financial reporting reviewed by leadership</p>
+      <span class="exp-date">Dec 2025 – Jan 2026</span>
+    </div>
+    <img src="jotun.jpg" alt="Jotun" class="exp-card-logo">
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section class="projects-section" id="projects">
+  <div class="projects-track">
+
+    <!-- PANEL 01: CAK AI -->
+    <div class="project-panel">
+      <div class="project-watermark">CAK AI</div>
+      <div class="project-number" style="color:#00F5FF;-webkit-text-fill-color:#00F5FF;">01</div>
+      <h3 class="project-title" style="color:#00F5FF;">CAK AI</h3>
+      <div class="project-rule" style="background:#00F5FF;"></div>
+      <div class="project-subtitle" style="color:#00F5FF;">AI-POWERED UGC AUTOMATION PLATFORM</div>
+      <p class="project-desc">Building the infrastructure for brands to go from brief to published content without touching a keyboard. AI handles generation, scheduling, and feedback loops.</p>
+      <div class="project-tags">
+        <span class="project-tag" style="border:1px solid #00F5FF;color:#00F5FF;">Python</span>
+        <span class="project-tag" style="border:1px solid #00F5FF;color:#00F5FF;">React</span>
+        <span class="project-tag" style="border:1px solid #00F5FF;color:#00F5FF;">Claude API</span>
+        <span class="project-tag" style="border:1px solid #00F5FF;color:#00F5FF;">GPT-4</span>
+        <span class="project-tag" style="border:1px solid #00F5FF;color:#00F5FF;">LLM Pipelines</span>
+      </div>
+      <ul class="project-bullets">
+        <li><span style="color:#00F5FF;">•</span> End-to-end: brand brief → AI generation → multi-platform scheduling</li>
+        <li><span style="color:#00F5FF;">•</span> Targeting SMB & DTC brands — cutting creative overhead by 80%</li>
+        <li><span style="color:#00F5FF;">•</span> React dashboard for campaign management & performance analytics</li>
+      </ul>
+      <a href="https://cakai.id/" target="_blank" class="project-btn" style="border:1px solid #00F5FF;color:#00F5FF;" onmouseover="this.style.background='#00F5FF';this.style.color='#000'" onmouseout="this.style.background='transparent';this.style.color='#00F5FF'">VISIT SITE</a>
+    </div>
+
+    <!-- PANEL 02: STADITEK -->
+    <div class="project-panel">
+      <div class="project-watermark">STADITEK</div>
+      <div class="project-number" style="color:#9B5DE5;-webkit-text-fill-color:#9B5DE5;">02</div>
+      <h3 class="project-title" style="color:#9B5DE5;">STADITEK</h3>
+      <div class="project-rule" style="background:#9B5DE5;"></div>
+      <div class="project-subtitle" style="color:#9B5DE5;">EDTECH NONPROFIT · INDONESIA</div>
+      <p class="project-desc">Co-founded a coding education nonprofit that actually placed people. 1,000+ students. 6-month full-stack program. 100% job placement or university admission.</p>
+      <div class="project-tags">
+        <span class="project-tag" style="border:1px solid #9B5DE5;color:#9B5DE5;">EdTech</span>
+        <span class="project-tag" style="border:1px solid #9B5DE5;color:#9B5DE5;">Nonprofit</span>
+        <span class="project-tag" style="border:1px solid #9B5DE5;color:#9B5DE5;">Full-Stack</span>
+        <span class="project-tag" style="border:1px solid #9B5DE5;color:#9B5DE5;">Indonesia</span>
+        <span class="project-tag" style="border:1px solid #9B5DE5;color:#9B5DE5;">Curriculum Design</span>
+      </div>
+      <ul class="project-bullets">
+        <li><span style="color:#9B5DE5;">•</span> 1,000+ students reached across Indonesia via bootcamps & mentorship</li>
+        <li><span style="color:#9B5DE5;">•</span> Placed graduates into 2 tech companies and 1 university program</li>
+        <li><span style="color:#9B5DE5;">•</span> Managed hiring pipeline, instructor coordination & curriculum</li>
+      </ul>
+      <a href="https://www.staditek.id/" target="_blank" class="project-btn" style="border:1px solid #9B5DE5;color:#9B5DE5;" onmouseover="this.style.background='#9B5DE5';this.style.color='#000'" onmouseout="this.style.background='transparent';this.style.color='#9B5DE5'">VISIT SITE</a>
+    </div>
+
+    <!-- PANEL 03: SMART WHEELCHAIR -->
+    <div class="project-panel">
+      <div class="project-watermark">SMART WHEELCHAIR</div>
+      <div class="project-number" style="color:#39FF14;-webkit-text-fill-color:#39FF14;">03</div>
+      <h3 class="project-title" style="color:#39FF14;">SMART WHEELCHAIR</h3>
+      <div class="project-rule" style="background:#39FF14;"></div>
+      <div class="project-subtitle" style="color:#39FF14;">IEEE PUBLISHED · ASSISTIVE TECHNOLOGY</div>
+      <p class="project-desc">Built a wheelchair controller for people with spinal cord injuries using pressure-cheek detection. Got it published. Won best presentation. Got funded.</p>
+      <div class="project-tags">
+        <span class="project-tag" style="border:1px solid #39FF14;color:#39FF14;">IEEE Published</span>
+        <span class="project-tag" style="border:1px solid #39FF14;color:#39FF14;">Arduino</span>
+        <span class="project-tag" style="border:1px solid #39FF14;color:#39FF14;">3D Printing</span>
+        <span class="project-tag" style="border:1px solid #39FF14;color:#39FF14;">Embedded Systems</span>
+        <span class="project-tag" style="border:1px solid #39FF14;color:#39FF14;">$3K Grant</span>
+      </div>
+      <ul class="project-bullets">
+        <li><span style="color:#39FF14;">•</span> Designed embedded control system + 3D-printed custom headset from scratch</li>
+        <li><span style="color:#39FF14;">•</span> Pressure-cheek input detection via Arduino for hands-free control</li>
+        <li><span style="color:#39FF14;">•</span> 1st Place Best Presentation at IEEE ICICEC · $3K research grant</li>
+      </ul>
+      <a href="https://ieeexplore.ieee.org/document/10808599" target="_blank" class="project-btn" style="border:1px solid #39FF14;color:#39FF14;" onmouseover="this.style.background='#39FF14';this.style.color='#000'" onmouseout="this.style.background='transparent';this.style.color='#39FF14'">READ PAPER</a>
+    </div>
+
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section class="skills-section" id="skills">
+  <div class="skills-watermark">WHAT I BRING</div>
+  <h2 class="section-title" style="position:relative;z-index:1;">WHAT I BRING<span style="-webkit-text-fill-color: var(--green);">.</span></h2>
+  <p style="font-size:0.75rem;color:var(--muted);letter-spacing:0.15em;text-transform:uppercase;margin-top:3rem;margin-bottom:1rem;position:relative;z-index:1;">Languages</p>
+  <div class="skills-grid" style="margin-top:0;">
+    <div class="skill-tag">Python</div>
+    <div class="skill-tag">JavaScript</div>
+    <div class="skill-tag">C++</div>
+    <div class="skill-tag">Java</div>
+    <div class="skill-tag">SQL</div>
+    <div class="skill-tag">LaTeX</div>
+  </div>
+  <p style="font-size:0.75rem;color:var(--muted);letter-spacing:0.15em;text-transform:uppercase;margin-top:2rem;margin-bottom:1rem;position:relative;z-index:1;">Tools</p>
+  <div class="skills-grid" style="margin-top:0;">
+    <div class="skill-tag">Power BI</div>
+    <div class="skill-tag">Excel</div>
+    <div class="skill-tag">SolidWorks</div>
+    <div class="skill-tag">Figma</div>
+    <div class="skill-tag">Arduino</div>
+    <div class="skill-tag">MQTT</div>
+  </div>
+</section>
+
+<!-- MARQUEE DIVIDER 2 (between Skills and Clubs) -->
+<div class="marquee-divider-2">
+  <div class="divider-inner-2">MECHE @ UCLA — 4.0 GPA — RISE GLOBAL FELLOW — IEEE PUBLISHED — $14K IN GRANTS — JAKARTA TO LA — MECHE @ UCLA — 4.0 GPA — RISE GLOBAL FELLOW — IEEE PUBLISHED — $14K IN GRANTS — JAKARTA TO LA — MECHE @ UCLA — 4.0 GPA — RISE GLOBAL FELLOW — IEEE PUBLISHED — $14K IN GRANTS — JAKARTA TO LA — </div>
+</div>
+
+<!-- CLUBS -->
+<section class="clubs-section" id="clubs">
+  <h2 class="section-title">CLUBS & ACTIVITIES<span style="-webkit-text-fill-color: var(--purple);">.</span></h2>
+
+  <div class="club-entry">
+    <div>
+      <div class="club-name">RISE GLOBAL FELLOW</div>
+      <p style="font-size:0.85rem;color:#888;line-height:1.7;margin-top:0.5rem;max-width:600px;">Selected as 1 of 100 winners globally from 40,000+ applicants — 0.25% acceptance rate. Includes full UCLA scholarship, $8K prototyping grant, and access to the most remarkable network of young people I've ever met.</p>
+      <a href="https://www.risefortheworld.org/winners/sukrit-birmani/" target="_blank" class="club-link">VIEW PROFILE →</a>
+    </div>
+    <div class="club-right">Schmidt Futures & Rhodes Trust<br>2023–Present</div>
+  </div>
+
+  <div class="club-entry">
+    <div>
+      <div class="club-name">BRUIN QUANT TRADERS</div>
+      <p style="font-size:0.85rem;color:#888;line-height:1.7;margin-top:0.5rem;max-width:600px;">Still working my way in — quantitative finance is next on the list.</p>
+    </div>
+    <div class="club-right">Member<br>2025–Present</div>
+  </div>
+
+  <div class="club-entry">
+    <div>
+      <div class="club-name">DESIGN BUILD FLY</div>
+      <p style="font-size:0.85rem;color:#888;line-height:1.7;margin-top:0.5rem;max-width:600px;">Manufacturing & Structures sub-team — designing and fabricating aircraft components for annual AIAA competition.</p>
+    </div>
+    <div class="club-right">Member<br>2025–Present</div>
+  </div>
+
+  <div class="club-entry">
+    <div>
+      <div class="club-name">IB RESEARCH GRANTS</div>
+      <p style="font-size:0.85rem;color:#888;line-height:1.7;margin-top:0.5rem;max-width:600px;">Awarded three separate IB grants totalling ~$14K to prototype and expand real-world impact projects — including funding for TERMISM, a solar-powered Arduino/IoT water quality monitoring system deployed across 3 Jakarta communities, and the Smart Wheelchair assistive controller research.</p>
+    </div>
+    <div class="club-right">3× Recipient<br>~$14K Total</div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="contact-section" id="contact">
+  <div class="contact-heading">
+    <span class="lets">LET'S</span>
+    <span class="talk gradient-text">TALK.</span>
+  </div>
+  <div class="contact-links">
+    <a href="mailto:sukritbirmani@gmail.com">sukritbirmani@gmail.com</a>
+    <a href="https://www.instagram.com/withsukrit/" target="_blank"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px;"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>@withsukrit</a>
+    <a href="https://linkedin.com/in/sukrit-birmani" target="_blank">linkedin.com/in/sukrit-birmani</a>
+  </div>
+  <div class="footer">© SUKRIT BIRMANI 2026</div>
+</section>
+
+<script>
+(function() {
+  gsap.registerPlugin(ScrollTrigger, TextPlugin);
+
+  /* ══════ SCROLL PROGRESS ══════ */
+  window.addEventListener('scroll', function() {
+    var h = document.documentElement.scrollHeight - window.innerHeight;
+    var pct = (window.scrollY / h) * 100;
+    document.getElementById('scroll-progress').style.width = pct + '%';
+  });
+
+  /* ══════ CURSOR TRAIL ══════ */
+  var accentColors = ['#4361EE','#9B5DE5','#00F5FF','#39FF14'];
+  var trailDots = [];
+  var trailContainer = document.getElementById('trail-container');
+  for (var i = 0; i < 8; i++) {
+    var dot = document.createElement('div');
+    dot.className = 'trail-dot';
+    var size = 8 - i;
+    dot.style.width = size + 'px';
+    dot.style.height = size + 'px';
+    dot.style.background = accentColors[i % 4];
+    dot.style.opacity = 1 - (i * 0.12);
+    trailContainer.appendChild(dot);
+    trailDots.push({
+      el: dot,
+      x: gsap.quickTo(dot, 'left', { duration: 0.15 + i * 0.04, ease: 'power3' }),
+      y: gsap.quickTo(dot, 'top', { duration: 0.15 + i * 0.04, ease: 'power3' })
+    });
+  }
+
+  /* ══════ CROSSHAIR CURSOR ══════ */
+  var crosshair = document.getElementById('crosshair');
+  var chH = crosshair.querySelector('.ch-h');
+  var chV = crosshair.querySelector('.ch-v');
+  var chCircle = crosshair.querySelector('.ch-circle');
+  var chX = gsap.quickTo(crosshair, 'left', { duration: 0.12, ease: 'power3' });
+  var chY = gsap.quickTo(crosshair, 'top', { duration: 0.12, ease: 'power3' });
+  var isHoveringLink = false;
+
+  var sectionColors = {
+    'hero-cinematic': '#00F5FF',
+    'hero-marquee': '#4361EE',
+    'about': '#00F5FF',
+    'work': '#4361EE',
+    'projects': '#4361EE',
+    'skills': '#39FF14',
+    'clubs': '#9B5DE5',
+    'contact': '#00F5FF'
+  };
+
+  function getSectionColor(x, y) {
+    var el = document.elementFromPoint(x, y);
+    while (el) {
+      if (el.id && sectionColors[el.id]) return sectionColors[el.id];
+      if (el.classList) {
+        if (el.classList.contains('about-section')) return sectionColors['about'];
+        if (el.classList.contains('experience-section')) return sectionColors['work'];
+        if (el.classList.contains('projects-section')) return sectionColors['projects'];
+        if (el.classList.contains('skills-section')) return sectionColors['skills'];
+        if (el.classList.contains('clubs-section')) return sectionColors['clubs'];
+        if (el.classList.contains('contact-section')) return sectionColors['contact'];
+
+      }
+      el = el.parentElement;
+    }
+    return '#00F5FF';
+  }
+
+  function updateCrosshairStyle(color, expanded) {
+    var lineLen = expanded ? 48 : 24;
+    var circleSize = expanded ? 16 : 8;
+    chH.style.width = lineLen + 'px';
+    chH.style.background = color;
+    chV.style.height = lineLen + 'px';
+    chV.style.background = color;
+    chCircle.style.width = circleSize + 'px';
+    chCircle.style.height = circleSize + 'px';
+    chCircle.style.borderColor = color;
+  }
+
+  document.addEventListener('mousemove', function(e) {
+    var mx = e.clientX, my = e.clientY;
+    chX(mx);
+    chY(my);
+    for (var i = 0; i < trailDots.length; i++) {
+      trailDots[i].x(mx - parseInt(trailDots[i].el.style.width)/2);
+      trailDots[i].y(my - parseInt(trailDots[i].el.style.height)/2);
+    }
+    var sColor = getSectionColor(mx, my);
+    updateCrosshairStyle(isHoveringLink ? sColor : '#ffffff', isHoveringLink);
+  });
+
+  document.addEventListener('mouseover', function(e) {
+    if (e.target.closest('a, button, .skill-tag, .club-entry')) isHoveringLink = true;
+  });
+  document.addEventListener('mouseout', function(e) {
+    if (e.target.closest('a, button, .skill-tag, .club-entry')) isHoveringLink = false;
+  });
+
+  /* ══════ MARQUEE LETTER SPLITTING ══════ */
+  var row2Colors = ['#4361EE','#9B5DE5','#00F5FF','#4361EE','#9B5DE5','#00F5FF'];
+
+  function splitLetters(container) {
+    var text = container.getAttribute('data-text');
+    var doubled = text + text;
+    container.innerHTML = '';
+    for (var i = 0; i < doubled.length; i++) {
+      var span = document.createElement('span');
+      span.textContent = doubled[i] === ' ' ? '\u00A0' : doubled[i];
+      container.appendChild(span);
+    }
+  }
+
+  function splitLettersRow2(container) {
+    var text = container.getAttribute('data-text');
+    var doubled = text + text;
+    container.innerHTML = '';
+    var words = doubled.split(/(\s+|—)/);
+    var colorIdx = 0;
+    words.forEach(function(word) {
+      if (word === '—' || word.trim() === '') {
+        var span = document.createElement('span');
+        span.textContent = word === ' ' ? '\u00A0' : word;
+        span.style.color = var_muted;
+        container.appendChild(span);
+      } else {
+        var col = row2Colors[colorIdx % row2Colors.length];
+        colorIdx++;
+        for (var j = 0; j < word.length; j++) {
+          var span = document.createElement('span');
+          span.textContent = word[j];
+          span.style.color = col;
+          container.appendChild(span);
+        }
+      }
+    });
+  }
+  var var_muted = '#444';
+
+  var row1Inner = document.querySelector('.row-1 .marquee-inner');
+  var row2Inner = document.querySelector('.row-2 .marquee-inner');
+  var row3Inner = document.querySelector('.row-3 .marquee-inner');
+
+  splitLetters(row1Inner);
+  splitLettersRow2(row2Inner);
+  splitLetters(row3Inner);
+
+  /* ══════ ROW 1 FULL SCRAMBLE ON HOVER ══════ */
+  var scrambleChars = '$8?{!~@#%^&*';
+  var row1Scrambling = false;
+
+  function scrambleRow1() {
+    if (row1Scrambling) return;
+    row1Scrambling = true;
+    var spans = row1Inner.querySelectorAll('span');
+    var originals = [];
+    spans.forEach(function(s) { originals.push(s.textContent); });
+
+    /* Flash all to random scramble chars in red-orange */
+    spans.forEach(function(s) {
+      s.style.color = '#FF4500';
+      s.style.webkitTextFillColor = '#FF4500';
+      s.textContent = scrambleChars[Math.floor(Math.random() * scrambleChars.length)];
+    });
+
+    /* Resolve back letter by letter over 0.5s */
+    var total = spans.length;
+    var perLetter = 500 / total;
+    spans.forEach(function(s, idx) {
+      setTimeout(function() {
+        /* Another random scramble mid-resolve */
+        s.textContent = scrambleChars[Math.floor(Math.random() * scrambleChars.length)];
+        setTimeout(function() {
+          s.textContent = originals[idx];
+          s.style.color = '';
+          s.style.webkitTextFillColor = '';
+          if (idx === total - 1) row1Scrambling = false;
+        }, perLetter * 0.6);
+      }, idx * perLetter);
+    });
+  }
+
+  row1Inner.addEventListener('mouseenter', scrambleRow1);
+
+  /* ══════ MARQUEE LETTER WAVE (row 2 only — row 3 has no interaction) ══════ */
+  (function() {
+    var row2 = document.querySelector('.marquee-row.row-2');
+    var spans = row2.querySelectorAll('span');
+    spans.forEach(function(span, idx) {
+      span.addEventListener('mouseenter', function() {
+        gsap.to(span, { y: -15, scale: 1.3, duration: 0.2 });
+        var prev1 = spans[idx-1], prev2 = spans[idx-2];
+        var next1 = spans[idx+1], next2 = spans[idx+2];
+        if (prev1) gsap.to(prev1, { y: -10, scale: 1.15, duration: 0.25, delay: 0.03 });
+        if (prev2) gsap.to(prev2, { y: -5, scale: 1.05, duration: 0.3, delay: 0.06 });
+        if (next1) gsap.to(next1, { y: -10, scale: 1.15, duration: 0.25, delay: 0.03 });
+        if (next2) gsap.to(next2, { y: -5, scale: 1.05, duration: 0.3, delay: 0.06 });
+      });
+      span.addEventListener('mouseleave', function() {
+        [span, spans[idx-1], spans[idx-2], spans[idx+1], spans[idx+2]].forEach(function(s) {
+          if (s) gsap.to(s, { y: 0, scale: 1, duration: 0.3 });
+        });
+      });
+    });
+  })();
+
+  /* Row 1 individual letter wave with red-orange */
+  (function() {
+    var spans = row1Inner.querySelectorAll('span');
+    spans.forEach(function(span, idx) {
+      span.addEventListener('mouseenter', function() {
+        gsap.to(span, { y: -15, color: '#FF4500', scale: 1.3, duration: 0.2 });
+        var prev1 = spans[idx-1], prev2 = spans[idx-2];
+        var next1 = spans[idx+1], next2 = spans[idx+2];
+        if (prev1) gsap.to(prev1, { y: -10, scale: 1.15, duration: 0.25, delay: 0.03 });
+        if (prev2) gsap.to(prev2, { y: -5, scale: 1.05, duration: 0.3, delay: 0.06 });
+        if (next1) gsap.to(next1, { y: -10, scale: 1.15, duration: 0.25, delay: 0.03 });
+        if (next2) gsap.to(next2, { y: -5, scale: 1.05, duration: 0.3, delay: 0.06 });
+      });
+      span.addEventListener('mouseleave', function() {
+        [span, spans[idx-1], spans[idx-2], spans[idx+1], spans[idx+2]].forEach(function(s) {
+          if (s) gsap.to(s, { y: 0, color: '#fff', scale: 1, duration: 0.3 });
+        });
+      });
+    });
+  })();
+
+  /* ══════ MARQUEE SCROLL ANIMATION ══════ */
+  function animateMarquee(el, speed, dir) {
+    var inner = el.querySelector('.marquee-inner');
+    var w = inner.scrollWidth / 2;
+    gsap.set(inner, { x: dir === 'left' ? 0 : -w });
+    gsap.to(inner, {
+      x: dir === 'left' ? -w : 0,
+      duration: speed,
+      ease: 'none',
+      repeat: -1
+    });
+  }
+
+  /* ══════ SB LOGO SCRAMBLE ══════ */
+  var sbLogo = document.getElementById('sb-logo');
+  var sbScrambling = false;
+  sbLogo.addEventListener('mouseenter', function() {
+    if (sbScrambling) return;
+    sbScrambling = true;
+    var orig = 'SB';
+    var tl = gsap.timeline({ onComplete: function() { sbScrambling = false; } });
+    tl.to(sbLogo, { duration: 0.05, text: { value: scrambleChars[Math.floor(Math.random()*scrambleChars.length)] + scrambleChars[Math.floor(Math.random()*scrambleChars.length)] }, ease: 'none' })
+      .to(sbLogo, { duration: 0.05, text: { value: scrambleChars[Math.floor(Math.random()*scrambleChars.length)] + scrambleChars[Math.floor(Math.random()*scrambleChars.length)] }, ease: 'none' })
+      .to(sbLogo, { duration: 0.05, text: { value: scrambleChars[Math.floor(Math.random()*scrambleChars.length)] + scrambleChars[Math.floor(Math.random()*scrambleChars.length)] }, ease: 'none' })
+      .to(sbLogo, { duration: 0.05, text: { value: scrambleChars[Math.floor(Math.random()*scrambleChars.length)] + scrambleChars[Math.floor(Math.random()*scrambleChars.length)] }, ease: 'none' })
+      .to(sbLogo, { duration: 0.15, text: { value: 'SB' }, ease: 'none' });
+  });
+
+  /* ══════ STAN LEE IMAGE HOVER ══════ */
+  var heroWrap = document.querySelector('.hero-img-wrap');
+  var heroImg = heroWrap.querySelector('img');
+  var heroWebOverlay = heroWrap.querySelector('.hero-web-overlay');
+
+  heroWrap.addEventListener('mouseenter', function() {
+    gsap.to(heroImg, { filter: 'hue-rotate(240deg) saturate(2) brightness(1.2)', duration: 0.3 });
+    gsap.to(heroWebOverlay, { opacity: 0.1, duration: 0.3 });
+    /* Flicker */
+    var flickerTL = gsap.timeline();
+    flickerTL
+      .to(heroImg, { filter: 'hue-rotate(240deg) saturate(2) brightness(1.4)', duration: 0.05 })
+      .to(heroImg, { filter: 'hue-rotate(240deg) saturate(2) brightness(0.8)', duration: 0.05 })
+      .to(heroImg, { filter: 'hue-rotate(240deg) saturate(2) brightness(1.4)', duration: 0.05 })
+      .to(heroImg, { filter: 'hue-rotate(240deg) saturate(2) brightness(0.8)', duration: 0.05 })
+      .to(heroImg, { filter: 'hue-rotate(240deg) saturate(2) brightness(1.4)', duration: 0.05 })
+      .to(heroImg, { filter: 'hue-rotate(240deg) saturate(2) brightness(1.2)', duration: 0.05 });
+  });
+  heroWrap.addEventListener('mouseleave', function() {
+    gsap.to(heroImg, { filter: 'none', duration: 0.4, ease: 'power2.out' });
+    gsap.to(heroWebOverlay, { opacity: 0, duration: 0.3 });
+  });
+
+  /* ══════ ABOUT PHOTO SLIDESHOW ══════ */
+  var slideImgs = document.querySelectorAll('.slide-img');
+  var slideIdx = 0;
+  if (slideImgs.length > 0) {
+    setInterval(function() {
+      slideImgs[slideIdx].style.opacity = '0';
+      slideIdx = (slideIdx + 1) % slideImgs.length;
+      slideImgs[slideIdx].style.opacity = '1';
+    }, 3000);
+  }
+
+  /* ══════ DIVIDER MARQUEES ══════ */
+  function animateDivider() {
+    var inner = document.querySelector('.divider-inner');
+    if (!inner) return;
+    var w = inner.scrollWidth / 2;
+    gsap.to(inner, { x: -w, duration: 40, ease: 'none', repeat: -1 });
+  }
+  function animateDivider2() {
+    var inner = document.querySelector('.divider-inner-2');
+    if (!inner) return;
+    var w = inner.scrollWidth / 2;
+    gsap.set(inner, { x: -w });
+    gsap.to(inner, { x: 0, duration: 45, ease: 'none', repeat: -1 });
+  }
+
+  /* ══════ VANTA ══════ */
+  var vantaEffect;
+  function initVanta() {
+    try {
+      vantaEffect = VANTA.NET({
+        el: '#hero-cinematic',
+        THREE: THREE,
+        color: 0xFF0000,
+        color2: 0x0000FF,
+        backgroundColor: 0x080808,
+        points: 9,
+        maxDistance: 23,
+        spacing: 18,
+        mouseControls: true,
+        touchControls: true
+      });
+    } catch(e) { console.log('Vanta init error:', e); }
+  }
+
+  /* ══════ PROJECT CARD SPOTLIGHT ══════ */
+  document.querySelectorAll('.project-panel').forEach(function(panel) {
+    panel.addEventListener('mousemove', function(e) {
+      var rect = panel.getBoundingClientRect();
+      var x = e.clientX - rect.left;
+      var y = e.clientY - rect.top;
+      panel.style.background = 'radial-gradient(circle 300px at ' + x + 'px ' + y + 'px, rgba(67,97,238,0.06) 0%, var(--bg) 70%)';
+    });
+    panel.addEventListener('mouseleave', function() {
+      panel.style.background = 'var(--bg)';
+    });
+  });
+
+  /* ══════ INTRO SEQUENCE ══════ */
+  var introTL = gsap.timeline({
+    onComplete: function() {
+      startMainAnimations();
+    }
+  });
+
+  introTL
+    .to('#intro-text', {
+      duration: 3,
+      text: { value: 'you know I guess one person can make a difference', delimiter: '' },
+      ease: 'none'
+    })
+    .to('#intro-text', { opacity: 0, duration: 0.8, ease: 'power2.inOut' }, '+=1.2')
+    .to('#intro', { yPercent: -100, duration: 1, ease: 'power3.inOut' })
+    .set('#intro', { display: 'none' });
+
+  /* ══════ MAIN ANIMATIONS ══════ */
+  function startMainAnimations() {
+    initVanta();
+    animateDivider();
+    animateDivider2();
+
+    /* Hero image entrance */
+    gsap.fromTo('.hero-img-wrap img', { scale: 0.85, opacity: 0 }, {
+      scale: 1, opacity: 1, duration: 1.2, ease: 'power3.out'
+    });
+
+    /* Nav + SB Logo */
+    gsap.to('#nav', { opacity: 1, duration: 0.6, delay: 1.5 });
+    gsap.to('#sb-logo', { opacity: 1, duration: 0.6, delay: 1.5 });
+
+    /* Hero marquee reveal on scroll */
+    gsap.to('#hero-marquee', {
+      opacity: 1, y: 0, duration: 0.8, ease: 'power4.out',
+      scrollTrigger: {
+        trigger: '#hero-marquee',
+        start: 'top 90%',
+        once: true
+      }
+    });
+
+    /* Start marquee animations */
+    var rows = document.querySelectorAll('.marquee-row');
+    animateMarquee(rows[0], 25, 'left');
+    animateMarquee(rows[1], 35, 'right');
+    animateMarquee(rows[2], 20, 'left');
+
+    /* About section */
+    gsap.from('.about-number', {
+      x: -100, opacity: 0, duration: 1, ease: 'power3.out',
+      scrollTrigger: { trigger: '.about-section', start: 'top 70%', once: true }
+    });
+    gsap.from('.about-bio', {
+      x: -60, opacity: 0, duration: 1, ease: 'power3.out', delay: 0.2,
+      scrollTrigger: { trigger: '.about-section', start: 'top 70%', once: true }
+    });
+    gsap.from('#about-slideshow', {
+      x: 60, opacity: 0, duration: 1, ease: 'power3.out', delay: 0.3,
+      scrollTrigger: { trigger: '.about-section', start: 'top 70%', once: true }
+    });
+
+    /* Experience cards stagger */
+    gsap.utils.toArray('.exp-card').forEach(function(card, i) {
+      gsap.to(card, {
+        opacity: 1, y: 0, duration: 0.8, ease: 'power3.out', delay: i * 0.15,
+        scrollTrigger: { trigger: card, start: 'top 85%', once: true }
+      });
+    });
+
+    /* Projects horizontal scroll */
+    var track = document.querySelector('.projects-track');
+    if (track) {
+      gsap.to(track, {
+        x: function() { return -(track.scrollWidth - window.innerWidth); },
+        ease: 'none',
+        scrollTrigger: {
+          trigger: '.projects-section',
+          pin: true,
+          scrub: 1,
+          end: function() { return '+=' + track.scrollWidth; }
+        }
+      });
+    }
+
+    /* Skills title slam */
+    gsap.from('.skills-section .section-title', {
+      x: -200, opacity: 0, duration: 0.8, ease: 'power4.out',
+      scrollTrigger: { trigger: '.skills-section', start: 'top 70%', once: true }
+    });
+
+    /* Skills waterfall */
+    gsap.utils.toArray('.skill-tag').forEach(function(tag, i) {
+      gsap.to(tag, {
+        opacity: 1, y: 0, duration: 0.8, ease: 'elastic.out(1, 0.5)', delay: i * 0.08,
+        scrollTrigger: { trigger: '.skills-grid', start: 'top 80%', once: true }
+      });
+    });
+
+    /* Clubs wipe in */
+    gsap.utils.toArray('.club-entry').forEach(function(entry, i) {
+      gsap.to(entry, {
+        opacity: 1, clipPath: 'inset(0 0% 0 0)', duration: 0.8, ease: 'power3.out', delay: i * 0.1,
+        scrollTrigger: { trigger: entry, start: 'top 85%', once: true }
+      });
+    });
+
+    /* Contact collision */
+    ScrollTrigger.create({
+      trigger: '.contact-section',
+      start: 'top 70%',
+      once: true,
+      onEnter: function() {
+        gsap.to('.lets', { opacity: 1, x: 0, duration: 0.8, ease: 'power4.out' });
+        gsap.to('.talk', { opacity: 1, x: 0, duration: 0.8, ease: 'power4.out', delay: 0.15 });
+      }
+    });
+  }
+})();
+</script>
+</body>
+</html>
